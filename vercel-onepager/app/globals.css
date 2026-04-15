@@ -337,3 +337,29 @@ textarea {
     font-size: 2.5rem;
   }
 }
+.brand-search {
+  min-width: 220px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  outline: none;
+  transition: all 0.18s ease;
+}
+
+.brand-search::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+.brand-search:focus {
+  border-color: rgba(52, 211, 153, 0.7);
+  box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.16);
+}
+
+@media (max-width: 640px) {
+  .brand-search {
+    width: 100%;
+    min-width: 0;
+  }
+}
