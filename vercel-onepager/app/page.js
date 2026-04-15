@@ -145,61 +145,70 @@ export default function HomePage() {
     <main className="page">
       <div className="bg-orb bg-orb-1" />
       <div className="bg-orb bg-orb-2" />
+      <div className="bg-grid" />
       <div className="bg-noise" />
 
       <div className="container">
-        <header className="header">
-          <h1 className="title">Campaigns with no limitations</h1>
+        <header className="hero">
+          <div className="hero-inner">
+            <div className="eyebrow">Partner overview</div>
+            <h1 className="title">Campaigns with no limitations</h1>
 
-          <div className="top-stats">
-            <span>No restrictions on CAP’s</span>
-            <span className="dot">○</span>
-            <span>{rows.length || '—'} Campaigns</span>
-            <span className="dot">○</span>
-            <span>21 Advertisers</span>
-            <span className="dot">○</span>
-            <span>{countries.length || '—'} Countries</span>
+            <div className="top-stats">
+              <span>No restrictions on CAP’s</span>
+              <span className="dot">•</span>
+              <span>{rows.length || '—'} Campaigns</span>
+              <span className="dot">•</span>
+              <span>21 Advertisers</span>
+              <span className="dot">•</span>
+              <span>{countries.length || '—'} Countries</span>
+            </div>
+
+            <div className="status">{status}</div>
           </div>
-
-          <div className="status">{status}</div>
         </header>
 
-        <section className="filter-bar">
-          <button
-            onClick={resetFilters}
-            className={`filter-pill ${selectedCountries.length === 0 ? 'active' : ''}`}
-          >
-            ALL
-          </button>
+        <section className="filter-shell">
+          <div className="filter-bar">
+            <button
+              onClick={resetFilters}
+              className={`filter-pill ${selectedCountries.length === 0 ? 'active' : ''}`}
+            >
+              ALL
+            </button>
 
-          {availableFilters.map((country) => {
-            const isSelected = selectedCountries.includes(country.name);
+            {availableFilters.map((country) => {
+              const isSelected = selectedCountries.includes(country.name);
 
-            return (
-              <button
-                key={country.name}
-                onClick={() => toggleCountry(country.name)}
-                title={country.name}
-                className={`flag-pill ${isSelected ? 'active' : ''} ${
-                  selectedCountries.length > 0 && !isSelected ? 'muted' : ''
-                }`}
-              >
-                {country.flag}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={country.name}
+                  onClick={() => toggleCountry(country.name)}
+                  title={country.name}
+                  className={`flag-pill ${isSelected ? 'active' : ''} ${
+                    selectedCountries.length > 0 && !isSelected ? 'muted' : ''
+                  }`}
+                >
+                  {country.flag}
+                </button>
+              );
+            })}
+          </div>
         </section>
 
         <section className="grid">
           {filteredCountries.map((country) => (
             <article className="country" key={country.name}>
-              <div className="flag">{country.flag}</div>
-              <div className="brand-list">
-                {country.brands.map((brand) => (
-                  <div className="brand-item" key={brand}>
-                    {brand}
-                  </div>
-                ))}
+              <div className="country-card">
+                <div className="flag">{country.flag}</div>
+                <div className="country-name">{country.name}</div>
+                <div className="brand-list">
+                  {country.brands.map((brand) => (
+                    <div className="brand-item" key={brand}>
+                      {brand}
+                    </div>
+                  ))}
+                </div>
               </div>
             </article>
           ))}
