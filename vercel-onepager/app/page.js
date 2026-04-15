@@ -1,7 +1,7 @@
 import './globals.css';
 
 const SHEET_CSV_URL =
-  "/api/sheet";
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPnWI_pVzKgZOWAvVEAaSaJsob_oUNMOf4ZukA6ScOzMtkw4wIyUE7GCTorH7PSZYsoNitYDuT8d8Y/pub?gid=1075171072&single=true&output=csv';
 
 function parseCsvLine(line) {
   const result = [];
@@ -57,9 +57,9 @@ function groupRows(rows) {
   const grouped = new Map();
 
   rows.forEach((row) => {
-    const country = row.country || row.Country || 'Unknown';
-    const flag = row.flag || row.Flag || '🏳️';
-    const campaign = row.campaign || row.Campaign || '';
+    const country = row.country || 'Unknown';
+    const flag = row.flag || '🏳️';
+    const campaign = row.campaign || '';
 
     if (!campaign) return;
 
@@ -82,7 +82,7 @@ function groupRows(rows) {
 async function getRows() {
   try {
     const response = await fetch(SHEET_CSV_URL, {
-      next: { revalidate: 300 },
+      next: { revalidate: 60 },
     });
 
     if (!response.ok) {
@@ -90,8 +90,10 @@ async function getRows() {
     }
 
     const text = await response.text();
+    const parsed = parseCsv(text);
+
     return {
-      rows: parseCsv(text),
+      rows: parsed,
       status: 'Live data from Google Sheets',
     };
   } catch (error) {
@@ -133,6 +135,10 @@ export default async function HomePage() {
             </article>
           ))}
         </section>
+
+        <div className="footer-note">
+          Partner one-pager • update the sheet and the page refreshes automatically
+        </div>
       </div>
     </main>
   );
