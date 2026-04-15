@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import './globals.css';
 
 const SHEET_CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPnWI_pVzKgZOWAvVEAaSaJsob_oUNMOf4ZukA6ScOzMtkw4wIyUE7GCTorH7PSZYsoNitYDuT8d8Y/pub?gid=1075171072&single=true&output=csv';
@@ -85,7 +86,6 @@ export default function HomePage() {
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('Loading data...');
   const [selectedCountries, setSelectedCountries] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     async function loadSheet() {
@@ -121,30 +121,12 @@ export default function HomePage() {
   );
 
   const filteredCountries = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
+    if (selectedCountries.length === 0) return countries;
 
-    let result =
-      selectedCountries.length === 0
-        ? countries
-        : countries.filter((country) => selectedCountries.includes(country.name));
-
-    if (!normalizedSearch) return result;
-
-    return result
-      .map((country) => {
-        const matchingBrands = country.brands.filter((brand) =>
-          brand.toLowerCase().includes(normalizedSearch)
-        );
-
-        if (matchingBrands.length === 0) return null;
-
-        return {
-          ...country,
-          brands: matchingBrands,
-        };
-      })
-      .filter(Boolean);
-  }, [countries, selectedCountries, searchTerm]);
+    return countries.filter((country) =>
+      selectedCountries.includes(country.name)
+    );
+  }, [countries, selectedCountries]);
 
   function toggleCountry(countryName) {
     setSelectedCountries((current) => {
@@ -157,7 +139,6 @@ export default function HomePage() {
 
   function resetFilters() {
     setSelectedCountries([]);
-    setSearchTerm('');
   }
 
   return (
@@ -191,17 +172,10 @@ export default function HomePage() {
           <div className="filter-bar">
             <button
               onClick={resetFilters}
-              className={`filter-pill ${selectedCountries.length === 0 && !searchTerm ? 'active' : ''}`}
+              className={`filter-pill ${selectedCountries.length === 0 ? 'active' : ''}`}
             >
               ALL
             </button>
-
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search brand..."
-              className="brand-search"
-            />
 
             {availableFilters.map((country) => {
               const isSelected = selectedCountries.includes(country.name);
@@ -227,9 +201,7 @@ export default function HomePage() {
             <article className="country" key={country.name}>
               <div className="country-card">
                 <div className="flag">{country.flag}</div>
-                <div className="country-name">
-                  {country.name} ({country.brands.length})
-                </div>
+                <div className="country-name">{country.name}</div>
                 <div className="brand-list">
                   {country.brands.map((brand) => (
                     <div className="brand-item" key={brand}>
