@@ -143,35 +143,31 @@ export default function HomePage() {
 
   return (
     <main className="page">
+      <div className="bg-orb bg-orb-1" />
+      <div className="bg-orb bg-orb-2" />
+      <div className="bg-noise" />
+
       <div className="container">
         <header className="header">
           <h1 className="title">Campaigns with no limitations</h1>
-          <div className="subtitle">
-            No restrictions on CAPs · Easy to update from Google Sheets
+
+          <div className="top-stats">
+            <span>No restrictions on CAP’s</span>
+            <span className="dot">○</span>
+            <span>{rows.length || '—'} Campaigns</span>
+            <span className="dot">○</span>
+            <span>21 Advertisers</span>
+            <span className="dot">○</span>
+            <span>{countries.length || '—'} Countries</span>
           </div>
+
           <div className="status">{status}</div>
         </header>
 
-        <section
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '10px',
-            justifyContent: 'center',
-            marginBottom: '32px',
-          }}
-        >
+        <section className="filter-bar">
           <button
             onClick={resetFilters}
-            style={{
-              border: '1px solid #d1d5db',
-              borderRadius: '999px',
-              padding: '8px 14px',
-              background: selectedCountries.length === 0 ? '#111827' : '#fff',
-              color: selectedCountries.length === 0 ? '#fff' : '#111827',
-              cursor: 'pointer',
-              fontWeight: 600,
-            }}
+            className={`filter-pill ${selectedCountries.length === 0 ? 'active' : ''}`}
           >
             ALL
           </button>
@@ -184,18 +180,9 @@ export default function HomePage() {
                 key={country.name}
                 onClick={() => toggleCountry(country.name)}
                 title={country.name}
-                style={{
-                  border: '1px solid #d1d5db',
-                  borderRadius: '999px',
-                  padding: '8px 12px',
-                  background: isSelected ? '#111827' : '#fff',
-                  color: isSelected ? '#fff' : '#111827',
-                  opacity:
-                    selectedCountries.length === 0 || isSelected ? 1 : 0.45,
-                  cursor: 'pointer',
-                  fontSize: '24px',
-                  lineHeight: 1,
-                }}
+                className={`flag-pill ${isSelected ? 'active' : ''} ${
+                  selectedCountries.length > 0 && !isSelected ? 'muted' : ''
+                }`}
               >
                 {country.flag}
               </button>
@@ -207,7 +194,6 @@ export default function HomePage() {
           {filteredCountries.map((country) => (
             <article className="country" key={country.name}>
               <div className="flag">{country.flag}</div>
-              <div className="country-name">{country.name}</div>
               <div className="brand-list">
                 {country.brands.map((brand) => (
                   <div className="brand-item" key={brand}>
@@ -218,10 +204,6 @@ export default function HomePage() {
             </article>
           ))}
         </section>
-
-        <div className="footer-note">
-          Partner one-pager • click flags to filter countries
-        </div>
       </div>
     </main>
   );
