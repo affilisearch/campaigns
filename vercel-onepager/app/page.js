@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
 import './globals.css';
 
 const SHEET_CSV_URL =
@@ -79,35 +82,64 @@ function groupRows(rows) {
   );
 }
 
-async function getRows() {
-  try {
-    const response = await fetch(SHEET_CSV_URL, {
-      next: { revalidate: 60 },
-    });
+export default function HomePage() {
+  const [rows, setRows] = useState([]);
+  const [status, setStatus] = useState('Loading data...');
+  const [selectedCountries, setSelectedCountries] = useState([]);
 
-    if (!response.ok) {
-      throw new Error(`Failed to load sheet: ${response.status}`);
+  useEffect(() => {
+    async function loadSheet() {
+      try {
+        const response = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`Failed to load sheet: ${response.status}`);
+        }
+
+        const text = await response.text();
+        const parsed = parseCsv(text);
+
+        setRows(parsed);
+        setStatus('Live data from Google Sheets');
+      } catch (error) {
+        console.error(error);
+        setStatus('Could not load Google Sheet');
+      }
     }
 
-    const text = await response.text();
-    const parsed = parseCsv(text);
+    loadSheet();
+  }, []);
 
-    return {
-      rows: parsed,
-      status: 'Live data from Google Sheets',
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      rows: [],
-      status: 'Could not load Google Sheet',
-    };
+  const countries = useMemo(() => groupRows(rows), [rows]);
+
+  const availableFilters = useMemo(
+    () =>
+      countries.map((country) => ({
+        name: country.name,
+        flag: country.flag,
+      })),
+    [countries]
+  );
+
+  const filteredCountries = useMemo(() => {
+    if (selectedCountries.length === 0) return countries;
+
+    return countries.filter((country) =>
+      selectedCountries.includes(country.name)
+    );
+  }, [countries, selectedCountries]);
+
+  function toggleCountry(countryName) {
+    setSelectedCountries((current) => {
+      if (current.includes(countryName)) {
+        return current.filter((name) => name !== countryName);
+      }
+      return [...current, countryName];
+    });
   }
-}
 
-export default async function HomePage() {
-  const { rows, status } = await getRows();
-  const countries = groupRows(rows);
+  function resetFilters() {
+    setSelectedCountries([]);
+  }
 
   return (
     <main className="page">
@@ -120,8 +152,59 @@ export default async function HomePage() {
           <div className="status">{status}</div>
         </header>
 
+        <section
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+            justifyContent: 'center',
+            marginBottom: '32px',
+          }}
+        >
+          <button
+            onClick={resetFilters}
+            style={{
+              border: '1px solid #d1d5db',
+              borderRadius: '999px',
+              padding: '8px 14px',
+              background: selectedCountries.length === 0 ? '#111827' : '#fff',
+              color: selectedCountries.length === 0 ? '#fff' : '#111827',
+              cursor: 'pointer',
+              fontWeight: 600,
+            }}
+          >
+            ALL
+          </button>
+
+          {availableFilters.map((country) => {
+            const isSelected = selectedCountries.includes(country.name);
+
+            return (
+              <button
+                key={country.name}
+                onClick={() => toggleCountry(country.name)}
+                title={country.name}
+                style={{
+                  border: '1px solid #d1d5db',
+                  borderRadius: '999px',
+                  padding: '8px 12px',
+                  background: isSelected ? '#111827' : '#fff',
+                  color: isSelected ? '#fff' : '#111827',
+                  opacity:
+                    selectedCountries.length === 0 || isSelected ? 1 : 0.45,
+                  cursor: 'pointer',
+                  fontSize: '24px',
+                  lineHeight: 1,
+                }}
+              >
+                {country.flag}
+              </button>
+            );
+          })}
+        </section>
+
         <section className="grid">
-          {countries.map((country) => (
+          {filteredCountries.map((country) => (
             <article className="country" key={country.name}>
               <div className="flag">{country.flag}</div>
               <div className="country-name">{country.name}</div>
@@ -137,7 +220,7 @@ export default async function HomePage() {
         </section>
 
         <div className="footer-note">
-          Partner one-pager • update the sheet and the page refreshes automatically
+          Partner one-pager • click flags to filter countries
         </div>
       </div>
     </main>
