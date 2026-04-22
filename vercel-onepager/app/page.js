@@ -105,7 +105,7 @@ export default function HomePage() {
         const parsed = parseCsv(text);
 
         setRows(parsed);
-        setStatus('Live data from Google Sheets');
+        setStatus('Updated daily');
       } catch (error) {
         console.error(error);
         setStatus('Could not load Google Sheet');
