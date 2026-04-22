@@ -189,7 +189,7 @@ export default function HomePage() {
             <h1 className="title">All active campaigns</h1>
 
             <div className="top-stats">
-              <span>Sort with the buttons below</span>
+              <span>Sort and search within</span>
               <span className="dot">•</span>
               <span>{rows.length || '—'} Campaigns</span>
               <span className="dot">•</span>
