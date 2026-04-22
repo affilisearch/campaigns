@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'Campaigns with no limitations',
-  description: 'Partner one-pager powered by Google Sheets'
+  title: 'Affilisearch Offers',
+  description: 'All active campaigns with no cap restrictions. Updated daily'
 };
 
 export default function RootLayout({ children }) {
