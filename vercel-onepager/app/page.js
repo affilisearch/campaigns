@@ -186,7 +186,7 @@ export default function HomePage() {
         <header className="hero">
           <div className="hero-inner">
             <div className="eyebrow">Partner overview</div>
-            <h1 className="title">Campaigns with no limitations</h1>
+            <h1 className="title">All active campaigns</h1>
 
             <div className="top-stats">
               <span>No restrictions on CAP’s</span>
