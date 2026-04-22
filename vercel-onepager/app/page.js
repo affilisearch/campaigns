@@ -63,6 +63,7 @@ function groupRows(rows) {
     const country = row.country || 'Unknown';
     const flag = row.flag || '🏳️';
     const campaign = row.campaign || '';
+    const capType = (row.cap_type || 'limited').toLowerCase();
 
     if (!campaign) return;
 
@@ -74,7 +75,10 @@ function groupRows(rows) {
       });
     }
 
-    grouped.get(country).brands.push(campaign);
+    grouped.get(country).brands.push({
+      name: campaign,
+      capType,
+    });
   });
 
   return Array.from(grouped.values()).sort((a, b) =>
@@ -87,6 +91,7 @@ export default function HomePage() {
   const [status, setStatus] = useState('Loading data...');
   const [selectedCountries, setSelectedCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [capFilter, setCapFilter] = useState('all'); // all | unlimited | limited
 
   useEffect(() => {
     async function loadSheet() {
@@ -129,13 +134,21 @@ export default function HomePage() {
         ? countries
         : countries.filter((country) => selectedCountries.includes(country.name));
 
-    if (!normalizedSearch) return result;
-
     return result
       .map((country) => {
-        const matchingBrands = country.brands.filter((brand) =>
-          brand.toLowerCase().includes(normalizedSearch)
-        );
+        let matchingBrands = country.brands;
+
+        if (capFilter !== 'all') {
+          matchingBrands = matchingBrands.filter(
+            (brand) => brand.capType === capFilter
+          );
+        }
+
+        if (normalizedSearch) {
+          matchingBrands = matchingBrands.filter((brand) =>
+            brand.name.toLowerCase().includes(normalizedSearch)
+          );
+        }
 
         if (matchingBrands.length === 0) return null;
 
@@ -145,7 +158,7 @@ export default function HomePage() {
         };
       })
       .filter(Boolean);
-  }, [countries, selectedCountries, searchTerm]);
+  }, [countries, selectedCountries, searchTerm, capFilter]);
 
   function toggleCountry(countryName) {
     setSelectedCountries((current) => {
@@ -159,6 +172,7 @@ export default function HomePage() {
   function resetFilters() {
     setSelectedCountries([]);
     setSearchTerm('');
+    setCapFilter('all');
   }
 
   return (
@@ -192,9 +206,29 @@ export default function HomePage() {
           <div className="filter-bar">
             <button
               onClick={resetFilters}
-              className={`filter-pill ${selectedCountries.length === 0 && !searchTerm ? 'active' : ''}`}
+              className={`filter-pill ${
+                selectedCountries.length === 0 &&
+                !searchTerm &&
+                capFilter === 'all'
+                  ? 'active'
+                  : ''
+              }`}
             >
               ALL
+            </button>
+
+            <button
+              onClick={() => setCapFilter('unlimited')}
+              className={`filter-pill ${capFilter === 'unlimited' ? 'active' : ''}`}
+            >
+              Unlimited CAP
+            </button>
+
+            <button
+              onClick={() => setCapFilter('limited')}
+              className={`filter-pill ${capFilter === 'limited' ? 'active' : ''}`}
+            >
+              Limited CAP
             </button>
 
             <input
@@ -233,8 +267,8 @@ export default function HomePage() {
                 </div>
                 <div className="brand-list">
                   {country.brands.map((brand) => (
-                    <div className="brand-item" key={brand}>
-                      {brand}
+                    <div className="brand-item" key={`${country.name}-${brand.name}`}>
+                      {brand.name}
                     </div>
                   ))}
                 </div>
