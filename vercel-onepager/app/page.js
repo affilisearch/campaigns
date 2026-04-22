@@ -185,7 +185,7 @@ export default function HomePage() {
       <div className="container">
         <header className="hero">
           <div className="hero-inner">
-            <div className="eyebrow">Partner overview</div>
+            <div className="eyebrow">Affilisearch</div>
             <h1 className="title">All active campaigns</h1>
 
             <div className="top-stats">
