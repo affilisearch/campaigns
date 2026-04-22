@@ -189,7 +189,7 @@ export default function HomePage() {
             <h1 className="title">All active campaigns</h1>
 
             <div className="top-stats">
-              <span>No restrictions on CAP’s</span>
+              <span>Sort with the buttons below</span>
               <span className="dot">•</span>
               <span>{rows.length || '—'} Campaigns</span>
               <span className="dot">•</span>
